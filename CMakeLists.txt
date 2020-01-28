@@ -1,8 +1,15 @@
-﻿# CMakcmake_minimum_required (VERSION 3.8)
+﻿cmake_minimum_required (VERSION 3.8)
 
-project (lcc LANGUAGE C++)
+set(CMAKE_C_COMPILER clang)
+set(CMAKE_C_COMPILER_TARGET ${triple})
+set(CMAKE_CXX_COMPILER clang++)
+set(CMAKE_CXX_COMPILER_TARGET ${triple})
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+project (lcc LANGUAGES CXX)
 
 add_executable (lcc "src/main.cpp")
-set_target_properties(lcc PROPERTIES
-            CXX_STANDARD 17
+target_compile_features(lcc PUBLIC
+            "cxx_std_17"
             )
