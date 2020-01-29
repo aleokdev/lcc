@@ -9,6 +9,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project (lcc LANGUAGES CXX)
 
-add_executable (lcc "src/main.cpp")
+add_executable (lcc "src/main.cpp" "src/lcc/program.cpp")
 target_compile_features(lcc PUBLIC "cxx_std_17")
 target_include_directories(lcc PUBLIC "include/lcc")

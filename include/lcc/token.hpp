@@ -51,15 +51,16 @@ enum class TokenType {
 };
 
 static constexpr inline char label_delimiter = ':';
+static constexpr inline int max_token_size = 16;
 /* clang-format off */
-static inline token_bindings = std::unordered_map<std::string_view, TokenType> {
+static inline auto token_bindings = std::unordered_map<std::string_view, TokenType> ({
     {"s/", TokenType::s_specifier},
     {"c/", TokenType::c_specifier},
     {"w/", TokenType::w_specifier},
     {"e/", TokenType::e_specifier},
     {"?/", TokenType::equal_conditional},
     {"?>/", TokenType::greater_conditional},
-    {"/", TokenType::block_delimiter},
+    {"/", TokenType::end_code_block},
     {"#CHAR#", TokenType::char_expr},
     {"#WORD#", TokenType::word_expr},
     {"#TEXT#", TokenType::text_expr},
@@ -81,8 +82,8 @@ static inline token_bindings = std::unordered_map<std::string_view, TokenType> {
     {"[]", TokenType::change_stack},
     {"@[]", TokenType::move_val},
     {"=>", TokenType::jump_to}
-}
-/* clang-format on */
+});
+    /* clang-format on */
 
 class Token {
 private:
@@ -90,10 +91,11 @@ private:
     std::variant<std::string, int> value;
 
 public:
+    Token() {}
     Token(TokenType t) : type(t) {}
     template<typename V> Token(TokenType t, V val) : type(t), value(val) {}
 
-    const TokenType& get_type() const;
+    const TokenType& get_type() const { return type; }
 
     template<typename T> T get_value_as() { return std::get<T>(value) }
 };

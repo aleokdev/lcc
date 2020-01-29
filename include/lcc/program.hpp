@@ -9,12 +9,11 @@
 namespace lcc {
 class Program {
 public:
-    Program();
+    Program() {}
 
     static Program from_string(std::string_view);
-    static Program from_file(std::filesystem::path)
+    static Program from_file(std::filesystem::path);
 
-private:
     std::vector<Token> tokens;
 };
 } // namespace lcc

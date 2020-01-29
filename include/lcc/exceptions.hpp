@@ -14,12 +14,12 @@ private:
     std::string token;
 
 public:
-    SyntaxError(size_t _character, std::string&& _token) :
-        character(_character), token(std::move(_token)) {}
+    SyntaxError(size_t _character, std::string _token) :
+        character(_character), token(_token) {}
 
-    const char* what() override {
+    const char* what() const override {
         char buf[64];
-        sprintf_s(buf, 64, "Unrecognized token at character %zu: %s", character, token);
+        sprintf_s(buf, 64, "Unrecognized token at character %zu: %s", character, token.c_str());
         return buf;
     }
 };
