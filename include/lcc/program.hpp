@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <string_view>
 #include <vector>
+#include "token.hpp"
 
 namespace lcc {
 class Program {
