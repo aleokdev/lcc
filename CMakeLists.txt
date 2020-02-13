@@ -1,4 +1,4 @@
-﻿cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required (VERSION 3.8)
 
 set(CMAKE_C_COMPILER clang)
 set(CMAKE_C_COMPILER_TARGET ${triple})
@@ -11,4 +11,4 @@ project (lcc LANGUAGES CXX)
 
 add_executable (lcc "src/main.cpp" "src/lcc/program.cpp")
 target_compile_features(lcc PUBLIC "cxx_std_17")
-target_include_directories(lcc PUBLIC "include/lcc")
+target_include_directories(lcc PUBLIC "include")
