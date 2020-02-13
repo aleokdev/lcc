@@ -5,7 +5,7 @@
 namespace lcc {
 [[nodiscard]] const char* SyntaxError::what() const noexcept {
     char* buf = (char*)malloc(64);
-    std::sprintf(buf, "Unrecognized token at position %zu", prg->lexer_pc);
+    std::sprintf(buf, "Syntax error at position %zu: %s", prg->lexer_pc, message.c_str());
     return buf;
 }
 
