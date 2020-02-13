@@ -37,7 +37,6 @@ enum class TokenType {
     ord,           // o
     chr,           // c
     duplicate,     // >
-    duplicate_all, // >e
 
     exit_parent,    // ^/
     exit_specifier, // ^^/
@@ -75,7 +74,6 @@ static inline auto token_bindings = std::unordered_map<std::string_view, TokenTy
     {"o", TokenType::ord},
     {"c", TokenType::chr},
     {">", TokenType::duplicate},
-    {">e", TokenType::duplicate_all},
     {"^/", TokenType::exit_parent},
     {"^^/", TokenType::exit_specifier},
     {"^^^/", TokenType::exit_program},

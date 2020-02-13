@@ -10,7 +10,7 @@ block_starters = ["?/", "?>/"]
 block_enders = ["/", "^/", "^^/", "^^^/"]
 
 normal_tokens = ["#CHAR#", "#WORD#", "#TEXT#", "#INPUT_LENGTH#", "#STACK_LENGTH#",
-                 ".", "!", "<", "<e", "+", "-", "o", "c", ">", ">e", "[]", "@[]",
+                 ".", "!", "<", "<e", "+", "-", "o", "c", ">", "[]", "@[]",
                  # Technically not tokens, but some space should also be included with the program!
                  " ", "\t", "\n"]
 
