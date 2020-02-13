@@ -89,13 +89,13 @@ private:
     std::variant<std::string, int> value;
 
 public:
-    Token() {}
-    Token(TokenType t) : type(t) {}
+    Token() = default;
+    explicit Token(TokenType t) : type(t) {}
     template<typename V> Token(TokenType t, V val) : type(t), value(val) {}
 
-    const TokenType& get_type() const { return type; }
+    [[nodiscard]] const TokenType& get_type() const { return type; }
 
-    template<typename T> T get_value_as() { return std::get<T>(value) }
+    template<typename T> T get_value_as() { return std::get<T>(value); }
 };
 } // namespace lcc
 

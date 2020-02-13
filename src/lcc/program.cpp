@@ -1,7 +1,8 @@
-#include "program.hpp"
-#include "exceptions.hpp"
+#include <lcc/exceptions.hpp>
+#include <lcc/program.hpp>
 
 #include <algorithm>
+#include <sstream>
 #include <string>
 
 bool is_space(char c) {
@@ -15,27 +16,36 @@ bool is_space(char c) {
 
 namespace lcc {
 
-Program Program::from_string(std::string_view s) {
-    Program prg;
-
-    size_t pc = 0;
+Token Program::parse_next(std::istringstream& s) {
     std::string cur_token;
-    while (pc < s.size()) {
-        if (is_space(s[pc])) {
-            pc++;
+    size_t i = 0;
+    while (i < max_token_size) {
+        if (is_space(s.peek())) {
+            s.get();
             continue;
         }
+        cur_token += (char)s.get();
+        lexer_pc++;
+        if (token_bindings.find(cur_token) != token_bindings.end()) {
+            return Token(token_bindings[cur_token]);
+        } else if (cur_token.size() > max_token_size)
+            throw UnidentifiedTokenError(*this);
 
-        cur_token += s[pc];
-        if (token_bindings.find(cur_token) != token_bindings.end())
-        {
-            prg.tokens.emplace_back(token_bindings[cur_token]);
-            cur_token.clear();
-        }else if (cur_token.size() > max_token_size)
-            throw SyntaxError(pc, cur_token);
+        if (s.eof())
+            throw lcc::UnexpectedEOFError(*this);
 
-        pc++;
+        if (s.bad())
+            throw;
     }
+}
+
+Program Program::from_string(const std::string& s) {
+    Program prg;
+
+    // Lex & parse tokens
+    std::istringstream stream(s);
+    prg.lexer_pc = 0;
+    while (stream.peek() ^ std::char_traits<char>::eof()) { prg.tokens.emplace_back(prg.parse_next(stream)); }
 
     return prg;
 }
