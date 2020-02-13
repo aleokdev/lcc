@@ -14,9 +14,10 @@ class Program;
 class SyntaxError : public std::exception {
 private:
     Program* prg;
+    std::string message;
 
 public:
-    explicit SyntaxError(Program& _prg) : prg(&_prg) {}
+    explicit SyntaxError(Program& _prg, std::string _what) : prg(&_prg), message(_what) {}
 
     [[nodiscard]] const char* what() const noexcept override;
 };
