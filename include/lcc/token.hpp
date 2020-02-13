@@ -8,17 +8,23 @@
 
 namespace lcc {
 enum class TokenType {
-    s_specifier, // s/
-    c_specifier, // c/
-    w_specifier, // w/
-    e_specifier, // e/
+    specifier = 2 << 5, // Flag
+    block_starter = 2 << 6, // Flag
+    block_ender = 2 << 7, // Flag
+    s_specifier = specifier | block_starter +1, // s/
+    c_specifier = specifier | block_starter +2, // c/
+    w_specifier = specifier | block_starter +3, // w/
+    e_specifier = specifier | block_starter +4, // e/
 
-    equal_conditional,   // ?/
-    greater_conditional, // ?>/
+    equal_conditional = block_starter +1,   // ?/
+    greater_conditional = block_starter +2, // ?>/
 
-    end_code_block, // / (ends expression)
+    end_code_block = block_ender +1, // / (ends expression)
+    exit_parent = block_ender +2,    // ^/
+    exit_specifier = block_ender +3, // ^^/
+    exit_program = block_ender +4,   // ^^^/
 
-    integer,        // 123
+    integer = 1,        // 123
     string_literal, // "..."
 
     char_expr,         // #CHAR#
@@ -38,10 +44,6 @@ enum class TokenType {
     chr,           // c
     duplicate,     // >
 
-    exit_parent,    // ^/
-    exit_specifier, // ^^/
-    exit_program,   // ^^^/
-
     change_stack, // []
     move_val,     // @[]
 
@@ -49,8 +51,9 @@ enum class TokenType {
     jump_to // =>
 };
 
-static constexpr inline char label_delimiter = ':';
-static constexpr inline int max_token_size = 16;
+static constexpr char label_delimiter = ':';
+static constexpr char string_delimiter = '"';
+static constexpr int max_token_size = 16;
 /* clang-format off */
 static inline auto token_bindings = std::unordered_map<std::string_view, TokenType> ({
     {"s/", TokenType::s_specifier},
