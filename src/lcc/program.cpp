@@ -18,8 +18,7 @@ namespace lcc {
 
 Token Program::parse_next(std::istringstream& s) {
     std::string cur_token;
-    size_t i = 0;
-    while (i < max_token_size) {
+    for(;;) {
         if (is_space(s.peek())) {
             s.get();
             continue;
