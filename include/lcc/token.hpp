@@ -8,18 +8,18 @@
 
 namespace lcc {
 enum class TokenType {
-    specifier = 2 << 5,                          // Flag
-    block_starter = 2 << 6,                      // Flag
-    block_ender = 2 << 7,                        // Flag
-    s_specifier = specifier | block_starter + 1, // s/
-    c_specifier = specifier | block_starter + 2, // c/
-    w_specifier = specifier | block_starter + 3, // w/
-    e_specifier = specifier | block_starter + 4, // e/
+    specifier = 1 << 5,                            // Flag
+    block_starter = 1 << 6,                        // Flag
+    block_ender = 1 << 7,                          // Flag
+    s_specifier = (specifier | block_starter) + 1, // s/
+    c_specifier = (specifier | block_starter) + 2, // c/
+    w_specifier = (specifier | block_starter) + 3, // w/
+    e_specifier = (specifier | block_starter) + 4, // e/
 
-    equal_conditional = block_starter + 1,       // ?/
-    greater_conditional = block_starter + 2,     // ?>/
+    equal_conditional = block_starter + 1,   // ?/
+    greater_conditional = block_starter + 2, // ?>/
 
-    end_code_block = block_ender + 1,            // / (ends expression)
+    end_code_block = block_ender + 1, // / (ends expression)
     exit_parent = block_ender + 2,    // ^/
     exit_specifier = block_ender + 3, // ^^/
     exit_program = block_ender + 4,   // ^^^/
@@ -57,12 +57,8 @@ enum class TokenType {
     jump_to // =>
 };
 
-#define DEFINE_OPERATOR(op)                                                                        \
-    inline size_t operator op(TokenType t1, TokenType t2) { return ((size_t)t1 op(size_t) t2); }   \
-    inline size_t operator op(size_t t1, TokenType t2) { return (t1 op(size_t) t2); }
-DEFINE_OPERATOR(&)
-DEFINE_OPERATOR(^)
-#undef DEFINE_OPERATOR
+inline size_t operator &(TokenType t1, TokenType t2) { return ((size_t)t1 & (size_t)t2); }
+inline size_t operator &(size_t t1, TokenType t2) { return (t1 & (size_t)t2); }
 
 static constexpr char label_delimiter = ':';
 static constexpr char string_delimiter = '"';
