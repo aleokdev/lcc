@@ -8,31 +8,42 @@
 namespace lcc {
 
 Instance::Instance(Program& prg) : program(&prg), cur_stack_key(Value(0)) {
-    for (auto& t : prg.tokens)
-        if ((size_t)t.get_type() & (size_t)TokenType::specifier)
-            specifiers.emplace_back(&t);
+    for (auto it = prg.tokens.begin(); it < prg.tokens.end(); it++)
+        if (it->get_type() & TokenType::specifier)
+            specifiers.emplace_back(it);
 
     m_stack.create_stack(cur_stack_key);
 }
 
 void Instance::run(const std::string& input) {
-    for (auto it = specifiers.begin(); it < specifiers.end(); it++) { execute_specifier(it); }
+    for (auto it : specifiers)
+        if(it->get_type() == TokenType::s_specifier)
+            execute_specifier(it);
+    for(char c : input){
+        current_char = c;
+        current_text += c;
+        for (auto it : specifiers)
+            if(it->get_type() == TokenType::c_specifier)
+                execute_specifier(it);
+    }
+    for (auto it : specifiers)
+        if(it->get_type() == TokenType::e_specifier)
+            execute_specifier(it);
 }
-void Instance::execute_specifier(std::vector<Token*>::iterator& spec_it) {
-    while ((*spec_it)->get_type() ^ TokenType::block_ender) {
+void Instance::execute_specifier(TokenIterator& spec_it) {
+    spec_it++; // Skip specifier token
+    while (!(spec_it->get_type() & TokenType::block_ender)) {
         execute_command(spec_it);
-        spec_it++;
     }
 }
-void Instance::execute_conditional(std::vector<Token*>::iterator& cond_it) {
-
-    while ((*cond_it)->get_type() ^ TokenType::block_ender) {
+void Instance::execute_conditional(TokenIterator& cond_it) {
+    cond_it++; // Skip conditional token
+    while (!(cond_it->get_type() & TokenType::block_ender)) {
         execute_command(cond_it);
-        cond_it++;
     }
 }
-void Instance::execute_command(std::vector<lcc::Token*>::iterator& t) {
-    switch ((*t)->get_type()) {
+void Instance::execute_command(TokenIterator& t) {
+    switch (t->get_type()) {
         case TokenType::s_specifier:
         case TokenType::c_specifier:
         case TokenType::w_specifier:
@@ -50,10 +61,10 @@ void Instance::execute_command(std::vector<lcc::Token*>::iterator& t) {
             // Handled by execute_specifier or execute_conditional
             throw std::runtime_error("Internal runtime execution error, unexpected token");
 
-        case TokenType::integer: get_current_stack().emplace((*t)->get_value_as<int>()); break;
+        case TokenType::integer: get_current_stack().emplace(t->get_value_as<int>()); break;
 
         case TokenType::string_literal:
-            get_current_stack().emplace((*t)->get_value_as<std::string>());
+            get_current_stack().emplace(t->get_value_as<std::string>());
             break;
 
         case TokenType::char_expr:
@@ -183,7 +194,8 @@ void Instance::execute_command(std::vector<lcc::Token*>::iterator& t) {
         case TokenType::block_starter:
         case TokenType::block_ender: throw std::runtime_error("Invalid token. Broken build?");
     }
+    t++;
 }
-Token Instance::get_pc_token() { return **cur_token; }
+Token Instance::get_pc_token() { return *cur_token; }
 
 } // namespace lcc
