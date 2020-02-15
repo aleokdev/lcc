@@ -43,13 +43,14 @@ void Instance::execute_conditional(TokenIterator& cond_it) {
     }
 }
 void Instance::execute_command(TokenIterator& t) {
+    cur_token = t;
     switch (t->get_type()) {
         case TokenType::s_specifier:
         case TokenType::c_specifier:
         case TokenType::w_specifier:
         case TokenType::e_specifier:
             // Handled by execute_specifier
-            throw std::runtime_error("Unexpected token");
+            throw std::runtime_error("Internal runtime execution error, Unexpected token");
 
         case TokenType::equal_conditional:
         case TokenType::greater_conditional: execute_conditional(t); return;
