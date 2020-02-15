@@ -40,11 +40,8 @@ Token Program::parse_next(std::istringstream& s) {
         lexer_pc++;
         if (token_bindings.find(cur_token) != token_bindings.end() && token_bindings.find(cur_token+(char)s.peek()) == token_bindings.end()) {
             return Token(token_bindings[cur_token]);
-        } else if (cur_token.size() > max_token_size)
+        } else if (s.eof() || cur_token.size() > max_token_size)
             throw UnidentifiedTokenError(*this);
-
-        if (s.eof())
-            throw lcc::UnexpectedEOFError(*this);
 
         if (s.bad())
             throw;
@@ -65,7 +62,7 @@ Program Program::from_string(const std::string& s) {
         else if ((size_t)prg.tokens.back().get_type() & (size_t)TokenType::block_ender)
         {
             if(scope_level == 0)
-                throw SyntaxError(prg, "Used block ender outside of scope");
+                throw SyntaxError(prg, "Used block ender outside of scope (Check for extra slashes '/')");
             scope_level--;
         } else { // Any command
             if(scope_level == 0) // Outside specifier
@@ -73,7 +70,7 @@ Program Program::from_string(const std::string& s) {
         }
     }
     if(scope_level != 0)
-        throw SyntaxError(prg, "Scope does not end at EOF");
+        throw SyntaxError(prg, "Scope does not end at EOF (Did you forget a '/' character?)");
 
     return prg;
 }
