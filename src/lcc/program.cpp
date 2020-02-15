@@ -18,7 +18,20 @@ namespace lcc {
 
 Token Program::parse_next(std::istringstream& s) {
     std::string cur_token;
-    for(;;) {
+    if(s.peek() == string_delimiter)
+    {
+        s.get(); // Skip string delimiter
+        // Parse string
+        while(s.peek() != string_delimiter)
+        {
+            cur_token+=(char)s.get();
+            if (s.eof())
+                throw lcc::UnexpectedEOFError(*this);
+        }
+        s.get(); // Skip string delimiter
+        return Token(TokenType::string_literal, cur_token);
+    }
+    else for(;;) {
         if (is_space(s.peek())) {
             s.get();
             continue;
