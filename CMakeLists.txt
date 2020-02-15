@@ -15,6 +15,7 @@ add_executable (lcc
         "src/lcc/program.cpp"
         "src/lcc/exceptions.cpp"
         "include/lcc/lexer_state.hpp"
-        )
+        "src/lcc/instance.cpp"
+        "include/lcc/value.hpp" include/lcc/multi_stack.hpp)
 target_compile_features(lcc PUBLIC "cxx_std_17")
 target_include_directories(lcc PUBLIC "include")
