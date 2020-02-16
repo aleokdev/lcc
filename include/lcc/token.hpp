@@ -56,10 +56,10 @@ enum class TokenType {
 inline size_t operator&(TokenType t1, TokenType t2) { return ((size_t)t1 & (size_t)t2); }
 inline size_t operator&(size_t t1, TokenType t2) { return (t1 & (size_t)t2); }
 
-static constexpr char label_delimiter = ':';
-static constexpr char string_delimiter = '"';
-static constexpr int max_token_size = 16;
-static inline auto token_bindings = std::unordered_map<std::string_view, TokenType>(
+constexpr char label_delimiter = ':';
+constexpr char string_delimiter = '"';
+constexpr int max_token_size = 16;
+inline auto token_bindings = std::unordered_map<std::string_view, TokenType>(
     {{"s/", TokenType::s_specifier},
      {"c/", TokenType::c_specifier},
      {"w/", TokenType::w_specifier},
