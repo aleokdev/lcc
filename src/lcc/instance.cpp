@@ -233,18 +233,45 @@ void Instance::execute_command(TokenIterator& t) {
                 get_current_stack().emplace(std::pow(val2.get<float>(), (float)val1.get<int>()));
             else if (val2.get_value_type() == ValueType::integer &&
                      val1.get_value_type() == ValueType::integer)
-                get_current_stack().emplace(std::pow((float)val2.get<int>(), (float)val1.get<int>()));
+                get_current_stack().emplace(
+                    std::pow((float)val2.get<int>(), (float)val1.get<int>()));
             break;
         }
 
         case TokenType::duplicate:
-            if(get_current_stack().empty())
+            if (get_current_stack().empty())
                 throw NotEnoughStackItemsError(*this);
             get_current_stack().emplace(get_current_stack().top());
             break;
 
-        case TokenType::ord:
-        case TokenType::chr:
+        case TokenType::chr: {
+            if (get_current_stack().empty())
+                throw NotEnoughStackItemsError(*this);
+            if (get_current_stack().top().get_value_type() != ValueType::integer)
+                throw ValueTypeError(*this, ValueType::integer);
+            int chr = get_current_stack().top().get<int>();
+            if (!isascii(chr)) {
+                std::string err = "Invalid ASCII character code given to 'c': " +
+                                  std::to_string(chr);
+                throw std::runtime_error(err);
+            }
+            get_current_stack().emplace(std::string(1, (char)chr));
+            break;
+        }
+
+        case TokenType::ord: {
+            if (get_current_stack().empty())
+                throw NotEnoughStackItemsError(*this);
+            if (get_current_stack().top().get_value_type() != ValueType::integer)
+                throw ValueTypeError(*this, ValueType::integer);
+            auto str = get_current_stack().top().get<std::string>();
+            if (str.size() != 1)
+                throw std::runtime_error(
+                    "'o' token requires a single character as the last stack value");
+            get_current_stack().emplace((int)str[0]);
+            break;
+        }
+
         case TokenType::change_stack:
         case TokenType::move_val:
         case TokenType::jump_to:
