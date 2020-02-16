@@ -8,10 +8,10 @@ int main() {
     std::cout << "LCC Shell version " << LCC_VERSION << " running Linecrypt version " << LINECRYPT_VERSION << std::endl;
     std::cout << "By aleok (alexdevteam) 2019~2020, https://github.com/alexdevteam/lcc" << std::endl;
     std::cout << "Type 'exit' to exit." << std::endl;
-    std::cout << "-------------------------------------------------------------------" << std::endl;
+    std::cout << "-------------------------------------------------------------------";
     for(;;)
     {
-        std::cout << ">> ";
+        std::cout << std::endl << ">> ";
         std::string input;
         std::getline(std::cin, input);
         if(input == "exit")
