@@ -3,6 +3,7 @@
 #include "lcc/program.hpp"
 #include "lcc/token.hpp"
 
+#include <cmath>
 #include <iostream>
 
 namespace lcc {
@@ -17,30 +18,26 @@ Instance::Instance(Program& prg) : program(&prg), cur_stack_key(Value(0)) {
 
 void Instance::run(const std::string& input) {
     for (auto it : specifiers)
-        if(it->get_type() == TokenType::s_specifier)
+        if (it->get_type() == TokenType::s_specifier)
             execute_specifier(it);
-    for(char c : input){
+    for (char c : input) {
         current_char = c;
         current_text += c;
         for (auto it : specifiers)
-            if(it->get_type() == TokenType::c_specifier)
+            if (it->get_type() == TokenType::c_specifier)
                 execute_specifier(it);
     }
     for (auto it : specifiers)
-        if(it->get_type() == TokenType::e_specifier)
+        if (it->get_type() == TokenType::e_specifier)
             execute_specifier(it);
 }
 void Instance::execute_specifier(TokenIterator& spec_it) {
     spec_it++; // Skip specifier token
-    while (!(spec_it->get_type() & TokenType::block_ender)) {
-        execute_command(spec_it);
-    }
+    while (!(spec_it->get_type() & TokenType::block_ender)) { execute_command(spec_it); }
 }
 void Instance::execute_conditional(TokenIterator& cond_it) {
     cond_it++; // Skip conditional token
-    while (!(cond_it->get_type() & TokenType::block_ender)) {
-        execute_command(cond_it);
-    }
+    while (!(cond_it->get_type() & TokenType::block_ender)) { execute_command(cond_it); }
 }
 void Instance::execute_command(TokenIterator& t) {
     cur_token = t;
@@ -178,17 +175,74 @@ void Instance::execute_command(TokenIterator& t) {
             break;
         }
 
+        case TokenType::multiply: {
+            if (get_current_stack().size() < 2)
+                throw NotEnoughStackItemsError(*this);
+
+            const Value val1 = get_current_stack().top();
+            get_current_stack().pop();
+            if (val1.get_value_type() != ValueType::integer &&
+                val1.get_value_type() != ValueType::decimal)
+                throw ValueTypeError(*this, ValueType::number);
+
+            const Value val2 = get_current_stack().top();
+            get_current_stack().pop();
+            if (val2.get_value_type() != ValueType::integer &&
+                val2.get_value_type() != ValueType::decimal)
+                throw ValueTypeError(*this, ValueType::number);
+
+            if (val1.get_value_type() == ValueType::decimal &&
+                val2.get_value_type() == ValueType::decimal)
+                get_current_stack().emplace(val1.get<float>() * val2.get<float>());
+            else if (val1.get_value_type() == ValueType::integer &&
+                     val2.get_value_type() == ValueType::decimal)
+                get_current_stack().emplace(val1.get<int>() * val2.get<float>());
+            else if (val1.get_value_type() == ValueType::decimal &&
+                     val2.get_value_type() == ValueType::integer)
+                get_current_stack().emplace(val1.get<float>() * val2.get<int>());
+            else if (val1.get_value_type() == ValueType::integer &&
+                     val2.get_value_type() == ValueType::integer)
+                get_current_stack().emplace(val1.get<int>() * val2.get<int>());
+            break;
+        }
+
+        case TokenType::power: {
+            if (get_current_stack().size() < 2)
+                throw NotEnoughStackItemsError(*this);
+
+            const Value val1 = get_current_stack().top();
+            get_current_stack().pop();
+            if (val1.get_value_type() != ValueType::integer &&
+                val1.get_value_type() != ValueType::decimal)
+                throw ValueTypeError(*this, ValueType::number);
+
+            const Value val2 = get_current_stack().top();
+            get_current_stack().pop();
+            if (val2.get_value_type() != ValueType::integer &&
+                val2.get_value_type() != ValueType::decimal)
+                throw ValueTypeError(*this, ValueType::number);
+
+            if (val1.get_value_type() == ValueType::decimal &&
+                val2.get_value_type() == ValueType::decimal)
+                get_current_stack().emplace(std::pow(val1.get<float>(), val2.get<float>()));
+            else if (val1.get_value_type() == ValueType::integer &&
+                     val2.get_value_type() == ValueType::decimal)
+                get_current_stack().emplace(std::pow((float)val1.get<int>(), val2.get<float>()));
+            else if (val1.get_value_type() == ValueType::decimal &&
+                     val2.get_value_type() == ValueType::integer)
+                get_current_stack().emplace(std::pow(val1.get<float>(), (float)val2.get<int>()));
+            else if (val1.get_value_type() == ValueType::integer &&
+                     val2.get_value_type() == ValueType::integer)
+                get_current_stack().emplace(std::pow((float)val1.get<int>(), (float)val2.get<int>()));
+            break;
+        }
+
         case TokenType::ord:
         case TokenType::chr:
         case TokenType::duplicate:
         case TokenType::change_stack:
         case TokenType::move_val:
         case TokenType::jump_to:
-        case TokenType::cond_less:
-        case TokenType::cond_greater:
-        case TokenType::cond_eq_less:
-        case TokenType::cond_eq_greater:
-        case TokenType::cond_equal:
         default: throw std::runtime_error("Not implemented TokenType");
 
         case TokenType::specifier:

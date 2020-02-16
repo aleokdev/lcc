@@ -40,15 +40,11 @@ enum class TokenType {
 
     plus,      // +
     minus,     // -
+    multiply,  // *
+    power,     // ^
     ord,       // o
     chr,       // c
     duplicate, // >
-
-    cond_less,       // b<
-    cond_greater,    // b>
-    cond_eq_less,    // b<=
-    cond_eq_greater, // b>=
-    cond_equal,      // b=
 
     change_stack, // []
     move_val,     // @[]
@@ -57,8 +53,8 @@ enum class TokenType {
     jump_to // =>
 };
 
-inline size_t operator &(TokenType t1, TokenType t2) { return ((size_t)t1 & (size_t)t2); }
-inline size_t operator &(size_t t1, TokenType t2) { return (t1 & (size_t)t2); }
+inline size_t operator&(TokenType t1, TokenType t2) { return ((size_t)t1 & (size_t)t2); }
+inline size_t operator&(size_t t1, TokenType t2) { return (t1 & (size_t)t2); }
 
 static constexpr char label_delimiter = ':';
 static constexpr char string_delimiter = '"';
@@ -82,14 +78,11 @@ static inline auto token_bindings = std::unordered_map<std::string_view, TokenTy
      {"<e", TokenType::clear},
      {"+", TokenType::plus},
      {"-", TokenType::minus},
+     {"*", TokenType::multiply},
+     {"^", TokenType::power},
      {"o", TokenType::ord},
      {"c", TokenType::chr},
      {">", TokenType::duplicate},
-     {"b<", TokenType::cond_less},
-     {"b>", TokenType::cond_greater},
-     {"b<", TokenType::cond_eq_less},
-     {"b>=", TokenType::cond_eq_greater},
-     {"b=", TokenType::cond_equal},
      {"^/", TokenType::exit_parent},
      {"^^/", TokenType::exit_specifier},
      {"^^^/", TokenType::exit_program},
