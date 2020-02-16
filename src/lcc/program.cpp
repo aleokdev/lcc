@@ -9,8 +9,6 @@ namespace lcc {
 
 Token Program::parse_next(std::istringstream& s) {
     std::string cur_token;
-    while (::isspace(s.peek())) { s.get(); }
-
     if (s.peek() == string_delimiter) {
         s.get(); // Skip string delimiter
         // Parse string
@@ -53,6 +51,7 @@ Program Program::from_string(const std::string& s) {
     std::istringstream stream(s);
     prg.lexer_pc = 0;
     size_t scope_level = 0;
+    while (::isspace(stream.peek())) { stream.get(); }
     while (stream.peek() ^ std::char_traits<char>::eof()) {
         prg.tokens.emplace_back(prg.parse_next(stream));
         if ((size_t)prg.tokens.back().get_type() & (size_t)TokenType::block_starter)
@@ -66,6 +65,7 @@ Program Program::from_string(const std::string& s) {
             if (scope_level == 0) // Outside specifier
                 throw SyntaxError(prg, "Used command outside specifier");
         }
+        while (::isspace(stream.peek())) { stream.get(); }
     }
     if (scope_level != 0)
         throw SyntaxError(prg, "Scope does not end at EOF (Did you forget a '/' character?)");
