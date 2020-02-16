@@ -5,20 +5,11 @@
 #include <sstream>
 #include <string>
 
-bool is_space(char c) {
-    switch (c) {
-        case ' ':
-        case '\t':
-        case '\n': return true;
-        default: return false;
-    }
-}
-
 namespace lcc {
 
 Token Program::parse_next(std::istringstream& s) {
     std::string cur_token;
-    while (is_space(s.peek())) { s.get(); }
+    while (::isspace(s.peek())) { s.get(); }
 
     if (s.peek() == string_delimiter) {
         s.get(); // Skip string delimiter
