@@ -26,12 +26,7 @@ enum class TokenType {
 
     integer = 1,    // 123
     string_literal, // "..."
-
-    char_expr,         // #CHAR#
-    word_expr,         // #WORD#
-    text_expr,         // #TEXT#
-    input_length_expr, // #INPUT_LENGTH#
-    stack_length_expr, // #STACK_LENGTH#
+    variable, // #VAR#
 
     push_to_stdout,     // .
     push_all_to_stdout, // !
@@ -58,6 +53,7 @@ inline size_t operator&(size_t t1, TokenType t2) { return (t1 & (size_t)t2); }
 
 constexpr char label_delimiter = ':';
 constexpr char string_delimiter = '"';
+constexpr char variable_delimiter = '#';
 constexpr int max_token_size = 16;
 inline auto token_bindings = std::unordered_map<std::string_view, TokenType>(
     {{"s/", TokenType::s_specifier},
@@ -67,11 +63,6 @@ inline auto token_bindings = std::unordered_map<std::string_view, TokenType>(
      {"?/", TokenType::equal_conditional},
      {"?>/", TokenType::greater_conditional},
      {"/", TokenType::end_code_block},
-     {"#CHAR#", TokenType::char_expr},
-     {"#WORD#", TokenType::word_expr},
-     {"#TEXT#", TokenType::text_expr},
-     {"#INPUT_LENGTH#", TokenType::input_length_expr},
-     {"#STACK_LENGTH#", TokenType::stack_length_expr},
      {".", TokenType::push_to_stdout},
      {"!", TokenType::push_all_to_stdout},
      {"<", TokenType::pop},

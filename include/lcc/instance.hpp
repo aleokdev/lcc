@@ -35,6 +35,8 @@ private:
     std::string current_text; // #TEXT#
     size_t input_length; // #INPUT_LENGTH#
 
+    Value get_variable(std::string const&);
+
     void execute_specifier(TokenIterator& spec_it);
     void execute_command(TokenIterator&);
     void execute_conditional(TokenIterator&);

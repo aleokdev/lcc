@@ -65,28 +65,8 @@ void Instance::execute_command(TokenIterator& t) {
             get_current_stack().emplace(t->get_value_as<std::string>());
             break;
 
-        case TokenType::char_expr:
-            get_current_stack().emplace(Value(std::string(1, current_char)));
-            break;
-
-        case TokenType::word_expr: {
-            std::string str = current_word;
-            get_current_stack().emplace(Value(std::move(str)));
-            break;
-        }
-
-        case TokenType::text_expr: {
-            std::string str = current_text;
-            get_current_stack().emplace(Value(std::move(str)));
-            break;
-        }
-
-        case TokenType::input_length_expr:
-            get_current_stack().emplace(Value((int)input_length));
-            break;
-
-        case TokenType::stack_length_expr:
-            get_current_stack().emplace(Value((int)get_current_stack().size()));
+        case TokenType::variable:
+            get_current_stack().emplace(get_variable(t->get_value_as<std::string>()));
             break;
 
         case TokenType::push_to_stdout:
@@ -251,8 +231,8 @@ void Instance::execute_command(TokenIterator& t) {
                 throw ValueTypeError(*this, ValueType::integer);
             int chr = get_current_stack().top().get<int>();
             if (!isascii(chr)) {
-                std::string err = "Invalid ASCII character code given to 'c': " +
-                                  std::to_string(chr);
+                std::string err =
+                    "Invalid ASCII character code given to 'c': " + std::to_string(chr);
                 throw std::runtime_error(err);
             }
             get_current_stack().emplace(std::string(1, (char)chr));
@@ -283,6 +263,26 @@ void Instance::execute_command(TokenIterator& t) {
     }
     t++;
 }
+
 Token Instance::get_pc_token() { return *cur_token; }
+
+Value Instance::get_variable(std::string const& var_name) {
+    if(var_name == "CHAR")
+        return Value(std::string(1, current_char));
+    else if(var_name == "WORD")
+        return Value(std::string(current_word));
+    else if(var_name == "TEXT")
+        return Value(std::string(current_text));
+    else if(var_name == "INPUT_LENGTH")
+        return Value((int)input_length);
+    else if(var_name == "STACK_LENGTH")
+        return Value((int)get_current_stack().size());
+    else if(var_name == "VERSION")
+        return Value(std::string(LINECRYPT_VERSION));
+    else if(var_name == "__LCC__")
+        return Value(std::string(LCC_VERSION));
+    else
+        throw std::runtime_error("Variable named" + var_name + " doesn't exist.");
+}
 
 } // namespace lcc

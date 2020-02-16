@@ -28,8 +28,19 @@ Token Program::parse_next(std::istringstream& s) {
             num += s.get() - '0';
         }
         return Token(TokenType::integer, num);
-    }
-    else
+    } else if (s.peek() == variable_delimiter) {
+        s.get(); // Skip variable delimiter
+        // Parse variable
+        while (s.peek() != variable_delimiter) {
+            if(isspace(s.peek()))
+                throw SyntaxError(*this, "Variable names must not contain spaces");
+            cur_token += (char)s.get();
+            if (s.eof())
+                throw UnexpectedEOFError(*this);
+        }
+        s.get(); // Skip variable delimiter
+        return Token(TokenType::variable, cur_token);
+    } else
         for (;;) {
             cur_token += (char)s.get();
             lexer_pc++;
