@@ -222,18 +222,18 @@ void Instance::execute_command(TokenIterator& t) {
                 val2.get_value_type() != ValueType::decimal)
                 throw ValueTypeError(*this, ValueType::number);
 
-            if (val1.get_value_type() == ValueType::decimal &&
-                val2.get_value_type() == ValueType::decimal)
-                get_current_stack().emplace(std::pow(val1.get<float>(), val2.get<float>()));
-            else if (val1.get_value_type() == ValueType::integer &&
-                     val2.get_value_type() == ValueType::decimal)
-                get_current_stack().emplace(std::pow((float)val1.get<int>(), val2.get<float>()));
-            else if (val1.get_value_type() == ValueType::decimal &&
-                     val2.get_value_type() == ValueType::integer)
-                get_current_stack().emplace(std::pow(val1.get<float>(), (float)val2.get<int>()));
-            else if (val1.get_value_type() == ValueType::integer &&
-                     val2.get_value_type() == ValueType::integer)
-                get_current_stack().emplace(std::pow((float)val1.get<int>(), (float)val2.get<int>()));
+            if (val2.get_value_type() == ValueType::decimal &&
+                val1.get_value_type() == ValueType::decimal)
+                get_current_stack().emplace(std::pow(val2.get<float>(), val1.get<float>()));
+            else if (val2.get_value_type() == ValueType::integer &&
+                     val1.get_value_type() == ValueType::decimal)
+                get_current_stack().emplace(std::pow((float)val2.get<int>(), val1.get<float>()));
+            else if (val2.get_value_type() == ValueType::decimal &&
+                     val1.get_value_type() == ValueType::integer)
+                get_current_stack().emplace(std::pow(val2.get<float>(), (float)val1.get<int>()));
+            else if (val2.get_value_type() == ValueType::integer &&
+                     val1.get_value_type() == ValueType::integer)
+                get_current_stack().emplace(std::pow((float)val2.get<int>(), (float)val1.get<int>()));
             break;
         }
 
