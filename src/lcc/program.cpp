@@ -21,7 +21,17 @@ Token Program::parse_next(std::istringstream& s) {
         }
         s.get(); // Skip string delimiter
         return Token(TokenType::string_literal, cur_token);
-    } else
+    } else if (::isdigit(s.peek())){
+        int num = 0;
+        // Parse integer
+        while(isalnum(s.peek()))
+        {
+            num *= 10;
+            num += s.get() - '0';
+        }
+        return Token(TokenType::integer, num);
+    }
+    else
         for (;;) {
             cur_token += (char)s.get();
             lexer_pc++;
