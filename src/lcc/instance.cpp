@@ -237,9 +237,14 @@ void Instance::execute_command(TokenIterator& t) {
             break;
         }
 
+        case TokenType::duplicate:
+            if(get_current_stack().empty())
+                throw NotEnoughStackItemsError(*this);
+            get_current_stack().emplace(get_current_stack().top());
+            break;
+
         case TokenType::ord:
         case TokenType::chr:
-        case TokenType::duplicate:
         case TokenType::change_stack:
         case TokenType::move_val:
         case TokenType::jump_to:
