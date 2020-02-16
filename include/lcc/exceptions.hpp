@@ -69,5 +69,15 @@ public:
     [[nodiscard]] const char* what() const noexcept override;
 };
 
+class IntegerOverflowError : public std::exception {
+private:
+    Instance* instance;
+
+public:
+    explicit IntegerOverflowError(Instance& _i) : instance(&_i) {}
+
+    [[nodiscard]] const char* what() const noexcept override;
+};
+
 } // namespace lcc
 #endif
