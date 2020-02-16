@@ -24,7 +24,7 @@ Token Program::parse_next(std::istringstream& s) {
     } else if (::isdigit(s.peek())){
         int num = 0;
         // Parse integer
-        while(isalnum(s.peek()))
+        while(::isdigit(s.peek()))
         {
             num *= 10;
             num += s.get() - '0';
