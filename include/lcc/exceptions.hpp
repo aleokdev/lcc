@@ -17,10 +17,10 @@ class Instance;
 class SyntaxError : public std::exception {
 private:
     Program* prg;
-    std::string message;
+    const char* message;
 
 public:
-    explicit SyntaxError(Program& _prg, std::string _what) : prg(&_prg), message(_what) {}
+    explicit SyntaxError(Program& _prg, const char* _what) : prg(&_prg), message(_what) {}
 
     [[nodiscard]] const char* what() const noexcept override;
 };

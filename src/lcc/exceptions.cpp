@@ -2,12 +2,13 @@
 #include "lcc/instance.hpp"
 #include <algorithm>
 #include <cstdio>
+#include <cstring>
 #include <lcc/program.hpp>
 
 namespace lcc {
 [[nodiscard]] const char* SyntaxError::what() const noexcept {
-    char* buf = (char*)malloc(64);
-    std::sprintf(buf, "Syntax error at position %zu: %s", prg->lexer_pc, message.c_str());
+    char* buf = (char*)malloc(64+strlen(message));
+    std::sprintf(buf, "Syntax error at position %zu: %s", prg->lexer_pc, message);
     return buf;
 }
 
@@ -32,7 +33,7 @@ const char* NotEnoughStackItemsError::what() const noexcept {
     return buf;
 }
 const char* ValueTypeError::what() const noexcept {
-    char* buf = (char*)malloc(64);
+    char* buf = (char*)malloc(128);
     std::sprintf(
         buf, "Type error: '%s' command requires %s args, but %s was used instead",
         std::find_if(token_bindings.begin(), token_bindings.end(),
@@ -40,6 +41,11 @@ const char* ValueTypeError::what() const noexcept {
             ->first.data(),
         value_type_names[expected_type].data(),
         value_type_names[instance->get_current_stack().top().get_value_type()].data());
+    return buf;
+}
+const char* IntegerOverflowError::what() const noexcept {
+    char* buf = (char*)malloc(strlen("Integer overflow"));
+    ::strcpy(buf, "Integer overflow");
     return buf;
 }
 } // namespace lcc

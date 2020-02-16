@@ -23,9 +23,10 @@ public:
     MultiStack::ValStack& get_current_stack() { return m_stack[cur_stack_key]; }
 
 private:
+    using TokenIterator = std::vector<Token>::iterator;
     Program* program;
-    std::vector<Token*> specifiers;
-    std::vector<Token*>::iterator cur_token;
+    std::vector<TokenIterator> specifiers;
+    TokenIterator cur_token;
     MultiStack m_stack;
     Value cur_stack_key;
 
@@ -34,9 +35,9 @@ private:
     std::string current_text; // #TEXT#
     size_t input_length; // #INPUT_LENGTH#
 
-    void execute_specifier(std::vector<Token*>::iterator& spec_it);
-    void execute_command(std::vector<Token*>::iterator&);
-    void execute_conditional(std::vector<Token*>::iterator&);
+    void execute_specifier(TokenIterator& spec_it);
+    void execute_command(TokenIterator&);
+    void execute_conditional(TokenIterator&);
 };
 
 } // namespace lcc
