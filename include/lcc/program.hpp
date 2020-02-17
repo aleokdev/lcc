@@ -12,12 +12,14 @@
 namespace lcc {
 class Program {
 public:
-    Program() {}
+    Program() = default;
 
     static Program from_string(const std::string&);
     static Program from_file(std::filesystem::path);
 
+    using TokenIndex = size_t;
     std::vector<Token> tokens;
+    std::unordered_map<std::string, TokenIndex> labels;
     LexerState lexer_state;
     size_t lexer_pc;
 

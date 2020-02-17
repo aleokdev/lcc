@@ -4,7 +4,9 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <utility>
 #include <variant>
+#include <vector>
 
 namespace lcc {
 enum class TokenType {
@@ -45,7 +47,8 @@ enum class TokenType {
     move_val,     // @[]
 
     // Labels are not tokens
-    jump_to // =>
+    jump_to, // =>
+    noop // Tokens that get discarded (such as labels)
 };
 
 inline size_t operator&(TokenType t1, TokenType t2) { return ((size_t)t1 & (size_t)t2); }

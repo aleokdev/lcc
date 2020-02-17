@@ -252,14 +252,25 @@ void Instance::execute_command(TokenIterator& t) {
             break;
         }
 
+        case TokenType::noop: break;
+
+        case TokenType::jump_to: {
+            auto label_it = program->labels.find(t->get_value_as<std::string>());
+            if(label_it == program->labels.end())
+                throw std::runtime_error("Label " + t->get_value_as<std::string>() + " does not exist.");
+
+            t = program->tokens.begin() + label_it->second;
+            break;
+        }
+
         case TokenType::change_stack:
         case TokenType::move_val:
-        case TokenType::jump_to:
-        default: throw std::runtime_error("Not implemented TokenType");
+            throw std::runtime_error("Not implemented TokenType");
 
         case TokenType::specifier:
         case TokenType::block_starter:
-        case TokenType::block_ender: throw std::runtime_error("Invalid token. Broken build?");
+        case TokenType::block_ender:
+        default: throw std::runtime_error("Invalid token. Broken build?");
     }
     t++;
 }

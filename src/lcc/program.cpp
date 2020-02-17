@@ -19,11 +19,10 @@ Token Program::parse_next(std::istringstream& s) {
         }
         s.get(); // Skip string delimiter
         return Token(TokenType::string_literal, cur_token);
-    } else if (::isdigit(s.peek())){
+    } else if (::isdigit(s.peek())) {
         int num = 0;
         // Parse integer
-        while(::isdigit(s.peek()))
-        {
+        while (::isdigit(s.peek())) {
             num *= 10;
             num += s.get() - '0';
         }
@@ -32,7 +31,7 @@ Token Program::parse_next(std::istringstream& s) {
         s.get(); // Skip variable delimiter
         // Parse variable
         while (s.peek() != variable_delimiter) {
-            if(isspace(s.peek()))
+            if (isspace(s.peek()))
                 throw SyntaxError(*this, "Variable names must not contain spaces");
             cur_token += (char)s.get();
             if (s.eof())
@@ -40,19 +39,47 @@ Token Program::parse_next(std::istringstream& s) {
         }
         s.get(); // Skip variable delimiter
         return Token(TokenType::variable, cur_token);
-    } else
+    } else if (s.peek() == label_delimiter) {
+        s.get(); // Skip label delimiter
+        // Parse label
+        while (s.peek() != label_delimiter) {
+            if (isspace(s.peek()))
+                throw SyntaxError(*this, "Label names must not contain spaces");
+            cur_token += (char)s.get();
+            if (s.eof())
+                throw UnexpectedEOFError(*this);
+        }
+        s.get(); // Skip label delimiter
+        labels.emplace(std::move(cur_token), tokens.size());
+        return Token(TokenType::noop);
+    } else {
         for (;;) {
             cur_token += (char)s.get();
             lexer_pc++;
-            if (token_bindings.find(cur_token) != token_bindings.end() &&
+            auto token_binding_it = token_bindings.find(cur_token);
+            if (token_binding_it != token_bindings.end() &&
                 token_bindings.find(cur_token + (char)s.peek()) == token_bindings.end()) {
-                return Token(token_bindings[cur_token]);
+                if(token_binding_it->second == TokenType::jump_to)
+                {
+                    std::string goto_label_name;
+                    // Parse goto
+                    for(;;) {
+                        if (isspace(s.peek()))
+                            return Token(TokenType::jump_to, goto_label_name);
+                        goto_label_name += (char)s.get();
+                        if (s.eof())
+                            throw UnexpectedEOFError(*this);
+                    }
+                }
+                else
+                    return Token(token_binding_it->second);
             } else if (s.eof() || cur_token.size() > max_token_size)
                 throw UnidentifiedTokenError(*this);
 
             if (s.bad())
                 throw;
         }
+    }
 }
 
 Program Program::from_string(const std::string& s) {
