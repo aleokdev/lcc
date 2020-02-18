@@ -21,6 +21,8 @@ public:
         throw std::runtime_error("Could not find key in multistack.");
     }
 
+    [[nodiscard]] std::vector<std::pair<Value, ValStack>> const& get_values() { return values; }
+
 private:
     std::vector<std::pair<Value, ValStack>> values;
 };

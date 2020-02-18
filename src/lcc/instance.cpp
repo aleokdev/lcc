@@ -5,6 +5,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <algorithm>
 
 namespace lcc {
 
@@ -263,7 +264,18 @@ void Instance::execute_command(TokenIterator& t) {
             break;
         }
 
-        case TokenType::change_stack:
+        case TokenType::change_stack: {
+            if (get_current_stack().empty())
+                throw NotEnoughStackItemsError(*this);
+            Value new_key = get_current_stack().top();
+            get_current_stack().pop();
+            auto m_vals = m_stack.get_values();
+            if (std::find_if(m_vals.begin(), m_vals.end(), [&new_key](auto& i) { return i.first == new_key; }) == m_vals.end())
+                m_stack.create_stack(new_key);
+            cur_stack_key = new_key;
+            break;
+        }
+
         case TokenType::move_val:
             throw std::runtime_error("Not implemented TokenType");
 
