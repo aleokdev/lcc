@@ -3,9 +3,9 @@
 #include "lcc/program.hpp"
 #include "lcc/token.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <iostream>
-#include <algorithm>
 
 namespace lcc {
 
@@ -257,8 +257,9 @@ void Instance::execute_command(TokenIterator& t) {
 
         case TokenType::jump_to: {
             auto label_it = program->labels.find(t->get_value_as<std::string>());
-            if(label_it == program->labels.end())
-                throw std::runtime_error("Label " + t->get_value_as<std::string>() + " does not exist.");
+            if (label_it == program->labels.end())
+                throw std::runtime_error("Label " + t->get_value_as<std::string>() +
+                                         " does not exist.");
 
             t = program->tokens.begin() + label_it->second;
             break;
@@ -270,14 +271,28 @@ void Instance::execute_command(TokenIterator& t) {
             Value new_key = get_current_stack().top();
             get_current_stack().pop();
             auto m_vals = m_stack.get_values();
-            if (std::find_if(m_vals.begin(), m_vals.end(), [&new_key](auto& i) { return i.first == new_key; }) == m_vals.end())
+            if (std::find_if(m_vals.begin(), m_vals.end(),
+                             [&new_key](auto& i) { return i.first == new_key; }) == m_vals.end())
                 m_stack.create_stack(new_key);
             cur_stack_key = new_key;
             break;
         }
 
-        case TokenType::move_val:
-            throw std::runtime_error("Not implemented TokenType");
+        case TokenType::move_val: {
+            if (get_current_stack().size() < 2)
+                throw NotEnoughStackItemsError(*this);
+            Value new_stack_key = get_current_stack().top();
+            get_current_stack().pop();
+            Value val_to_move = get_current_stack().top();
+            get_current_stack().pop();
+            auto m_vals = m_stack.get_values();
+            if (std::find_if(m_vals.begin(), m_vals.end(), [&new_stack_key](auto& i) {
+                    return i.first == new_stack_key;
+                }) == m_vals.end())
+                m_stack.create_stack(new_stack_key);
+            m_stack[new_stack_key].emplace(val_to_move);
+            break;
+        }
 
         case TokenType::specifier:
         case TokenType::block_starter:
@@ -290,19 +305,19 @@ void Instance::execute_command(TokenIterator& t) {
 Token Instance::get_pc_token() { return *cur_token; }
 
 Value Instance::get_variable(std::string const& var_name) {
-    if(var_name == "CHAR")
+    if (var_name == "CHAR")
         return Value(std::string(1, current_char));
-    else if(var_name == "WORD")
+    else if (var_name == "WORD")
         return Value(std::string(current_word));
-    else if(var_name == "TEXT")
+    else if (var_name == "TEXT")
         return Value(std::string(current_text));
-    else if(var_name == "INPUT_LENGTH")
+    else if (var_name == "INPUT_LENGTH")
         return Value((int)input_length);
-    else if(var_name == "STACK_LENGTH")
+    else if (var_name == "STACK_LENGTH")
         return Value((int)get_current_stack().size());
-    else if(var_name == "VERSION")
+    else if (var_name == "VERSION")
         return Value(std::string(LINECRYPT_VERSION));
-    else if(var_name == "__LCC__")
+    else if (var_name == "__LCC__")
         return Value(std::string(LCC_VERSION));
     else
         throw std::runtime_error("Variable named" + var_name + " doesn't exist.");
