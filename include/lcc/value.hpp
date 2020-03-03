@@ -17,21 +17,19 @@ enum class ValueType {
     string,
     integer,
     decimal,
-    boolean,
+    // boolean, // TODO: Implement boolean type in LC2.0
     number = 128 // Special case ONLY used for formatting exceptions.
 };
 inline std::unordered_map<ValueType, std::string_view> value_type_names = {
     {ValueType::string, "string"},
     {ValueType::integer, "integer"},
-    {ValueType::decimal, "decimal"},
-    {ValueType::boolean, "boolean"}};
+    {ValueType::decimal, "decimal"}};
 
 class Value {
 public:
     explicit Value(std::string&& val) { value = std::move(val); }
     explicit Value(int val) { value = val; }
     explicit Value(float val) { value = val; }
-    explicit Value(bool val) { value = val; }
 
     template<typename T> T get() const { return std::get<T>(value); }
 
@@ -43,8 +41,6 @@ public:
                 return std::to_string(std::get<int>(value));
             case 2: // float
                 return std::to_string(std::get<float>(value));
-            case 3: // bool
-                return std::get<bool>(value) ? "true" : "false";
             default: // wut
                 throw std::runtime_error("Not implemented value as_string");
         }
@@ -55,7 +51,7 @@ public:
     bool operator==(const Value& other) { return other.value == value; }
 
 private:
-    std::variant<std::string, int, float, bool> value;
+    std::variant<std::string, int, float> value;
 };
 
 } // namespace lcc
