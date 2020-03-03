@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <string>
 
 namespace lcc {
 
@@ -100,12 +101,19 @@ void Instance::execute_command(TokenIterator& t) {
 
             const Value val1 = get_current_stack().top();
             get_current_stack().pop();
+
+            const Value val2 = get_current_stack().top();
+            get_current_stack().pop();
+            if (val1.get_value_type() == ValueType::string &&
+                val2.get_value_type() == ValueType::string) {
+                get_current_stack().emplace(val1.get<std::string>() + val2.get<std::string>());
+                break;
+            }
+
             if (val1.get_value_type() != ValueType::integer &&
                 val1.get_value_type() != ValueType::decimal)
                 throw ValueTypeError(*this, ValueType::number);
 
-            const Value val2 = get_current_stack().top();
-            get_current_stack().pop();
             if (val2.get_value_type() != ValueType::integer &&
                 val2.get_value_type() != ValueType::decimal)
                 throw ValueTypeError(*this, ValueType::number);
@@ -162,12 +170,30 @@ void Instance::execute_command(TokenIterator& t) {
 
             const Value val1 = get_current_stack().top();
             get_current_stack().pop();
+
+            const Value val2 = get_current_stack().top();
+            get_current_stack().pop();
+
+            auto repeat = [](std::string a, int n) -> std::string {
+                std::ostringstream os;
+                for (int i = 0; i < n; i++) os << a;
+                return os.str();
+            };
+
+            if (val1.get_value_type() == ValueType::string &&
+                val2.get_value_type() == ValueType::integer) {
+                get_current_stack().emplace(repeat(val1.get<std::string>(), val2.get<int>()));
+                break;
+            } else if (val1.get_value_type() == ValueType::integer &&
+                       val2.get_value_type() == ValueType::string) {
+                get_current_stack().emplace(repeat(val2.get<std::string>(), val1.get<int>()));
+                break;
+            }
+
             if (val1.get_value_type() != ValueType::integer &&
                 val1.get_value_type() != ValueType::decimal)
                 throw ValueTypeError(*this, ValueType::number);
 
-            const Value val2 = get_current_stack().top();
-            get_current_stack().pop();
             if (val2.get_value_type() != ValueType::integer &&
                 val2.get_value_type() != ValueType::decimal)
                 throw ValueTypeError(*this, ValueType::number);
