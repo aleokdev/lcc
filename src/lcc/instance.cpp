@@ -33,14 +33,36 @@ void Instance::run(const std::string& input) {
         if (it->get_type() == TokenType::e_specifier)
             execute_specifier(it);
 }
+
 void Instance::execute_specifier(TokenIterator& spec_it) {
     spec_it++; // Skip specifier token
     while (!(spec_it->get_type() & TokenType::block_ender)) { execute_command(spec_it); }
 }
-void Instance::execute_conditional(TokenIterator& cond_it) {
-    cond_it++; // Skip conditional token
-    while (!(cond_it->get_type() & TokenType::block_ender)) { execute_command(cond_it); }
+
+void Instance::execute_equal_conditional(TokenIterator& cond_it) {
+    if (get_current_stack().empty())
+        throw NotEnoughStackItemsError(*this);
+    if (get_current_stack().top().get_value_type() != ValueType::integer)
+        throw ValueTypeError(*this, ValueType::integer);
+    if (get_current_stack().top().get<int>() == 0) {
+        cond_it++; // Skip conditional token
+        while (!(cond_it->get_type() & TokenType::block_ender)) { execute_command(cond_it); }
+    } else
+        do { cond_it++; } while (!(cond_it->get_type() & TokenType::block_ender));
 }
+
+void Instance::execute_greater_conditional(TokenIterator& cond_it) {
+    if (get_current_stack().empty())
+        throw NotEnoughStackItemsError(*this);
+    if (get_current_stack().top().get_value_type() != ValueType::integer)
+        throw ValueTypeError(*this, ValueType::integer);
+    if (get_current_stack().top().get<int>() > 0) {
+        cond_it++; // Skip conditional token
+        while (!(cond_it->get_type() & TokenType::block_ender)) { execute_command(cond_it); }
+    } else
+        do { cond_it++; } while (!(cond_it->get_type() & TokenType::block_ender));
+}
+
 void Instance::execute_command(TokenIterator& t) {
     cur_token = t;
     switch (t->get_type()) {
@@ -51,8 +73,8 @@ void Instance::execute_command(TokenIterator& t) {
             // Handled by execute_specifier
             throw std::runtime_error("Internal runtime execution error, Unexpected token");
 
-        case TokenType::equal_conditional:
-        case TokenType::greater_conditional: execute_conditional(t); return;
+        case TokenType::equal_conditional: execute_equal_conditional(t); return;
+        case TokenType::greater_conditional: execute_greater_conditional(t); return;
 
         case TokenType::exit_parent:
         case TokenType::exit_specifier:

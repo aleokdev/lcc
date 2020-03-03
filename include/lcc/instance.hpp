@@ -39,7 +39,8 @@ private:
 
     void execute_specifier(TokenIterator& spec_it);
     void execute_command(TokenIterator&);
-    void execute_conditional(TokenIterator&);
+    void execute_equal_conditional(TokenIterator&);
+    void execute_greater_conditional(TokenIterator&);
 };
 
 } // namespace lcc
