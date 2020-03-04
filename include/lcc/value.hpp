@@ -10,6 +10,7 @@
 #include <string_view>
 #include <unordered_map>
 #include <variant>
+#include <stdexcept>
 
 namespace lcc {
 

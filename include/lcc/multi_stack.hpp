@@ -4,6 +4,7 @@
 #include <stack>
 #include <vector>
 #include <exception>
+#include <stdexcept>
 #include "lcc/value.hpp"
 
 namespace lcc{
